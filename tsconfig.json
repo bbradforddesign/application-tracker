@@ -8,5 +8,5 @@
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true
     },
-    "exclude": ["node_modules", "./src/**/*.t.ts", "./src/*.t.ts"]
+    "exclude": ["node_modules", "./src/**/*.test.ts", "./src/*.test.ts"]
 }
