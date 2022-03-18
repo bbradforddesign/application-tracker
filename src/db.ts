@@ -11,4 +11,8 @@ const pool = new Pool({
     port: parseInt(process.env.DB_PORT || "5432"),
 });
 
+pool.on("connect", (client) => [
+    client.query(`SET search_path TO '${process.env.NODE_ENV}'`),
+]);
+
 export default pool;

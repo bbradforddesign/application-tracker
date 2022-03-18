@@ -17,6 +17,7 @@ services:
         ports:
             - "5432:${DB_PORT}"
         volumes:
+            - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql
             - data:/data/db
         environment:
             - POSTGRES_PASSWORD=${DB_PASSWORD}
@@ -32,4 +33,4 @@ services:
         ports:
             - "5050:${PGADMIN_PORT}"
 volumes:
-    data: {}
+    data:

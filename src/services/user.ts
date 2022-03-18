@@ -7,7 +7,7 @@ export const getUser = (id: number): Promise<User> => {
         .then((client) => {
             return client
                 .query({
-                    text: `SELECT * FROM "User".users WHERE id = $1`,
+                    text: `SELECT * FROM users WHERE id = $1`,
                     values: [id],
                 })
                 .then((res) => {
@@ -32,7 +32,7 @@ export const createUser = (fields: UserFields): Promise<User> => {
             return client
                 .query({
                     text: `
-                INSERT INTO "User".users(
+                INSERT INTO users (
                     first_name, 
                     last_name
                 ) VALUES (
