@@ -1,5 +1,14 @@
 import app from "../../app";
 import request from "supertest";
+import pool from "../../db";
+
+// wipe user table after every test
+afterEach(async () => {
+    const client = await pool.connect();
+    client.query("TRUNCATE users;").then(() => {
+        client.release();
+    });
+});
 
 describe("POST /user", () => {
     test("successfully registers a user", async () => {

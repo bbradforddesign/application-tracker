@@ -1,16 +1,26 @@
+import pool from "../../db";
 import { registerUser } from "../../controllers/user";
 import { UserFields } from "../../models/user";
 import { getUser, createUser } from "../../services/user";
 
+// wipe user table after every test
+afterEach(async () => {
+    const client = await pool.connect();
+    client.query("TRUNCATE users;").then(() => {
+        client.release();
+    });
+});
+
 describe("User services", () => {
     test("retrieves user from the users table", async () => {
         try {
-            const user = await getUser(1);
-            expect(user).toEqual({
-                id: 1,
-                first_name: "John",
-                last_name: "Doe",
+            const newUser = await registerUser({
+                first_name: "Bob",
+                last_name: "Smith",
             });
+            const user = await getUser(newUser.id);
+            expect(user.first_name).toEqual("Bob");
+            expect(user.last_name).toEqual("Smith");
         } catch (err) {
             console.log(err);
         }
