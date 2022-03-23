@@ -1,17 +1,30 @@
-/*
 import app from "../../../app";
 import request from "supertest";
 import pool from "../../../db";
 
-// wipe user table after every test
-afterEach(async () => {
-    const client = await pool.connect();
-    client.query("TRUNCATE users;").then(() => {
-        client.release();
-    });
-});
-
 describe("POST /user", () => {
+    // mock user table
+    beforeEach(async () => {
+        try {
+            return await pool.query(`
+                CREATE TEMPORARY TABLE user_account (LIKE user_account INCLUDING ALL)
+            `);
+        } catch (err) {
+            console.log(err);
+        }
+    });
+
+    // drop mocked user table
+    afterEach(async () => {
+        try {
+            return await pool.query(`
+                DROP TABLE IF EXISTS pg_temp.user_account
+            `);
+        } catch (err) {
+            console.log(err);
+        }
+    });
+
     test("successfully registers a user", async () => {
         const res = await request(app)
             .post("/user")
@@ -45,4 +58,3 @@ describe("POST /user", () => {
         expect(res.status).toBe(400);
     });
 });
-*/

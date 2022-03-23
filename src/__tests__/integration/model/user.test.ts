@@ -2,11 +2,11 @@ import pool from "../../../db";
 import { UserFields } from "../../../interfaces/user";
 import UserModel from "../../../models/user";
 
-describe("User services", () => {
+describe("User model", () => {
     // mock user table
     beforeEach(async () => {
         try {
-            await pool.query(`
+            return await pool.query(`
                 CREATE TEMPORARY TABLE user_account (LIKE user_account INCLUDING ALL)
             `);
         } catch (err) {
@@ -17,7 +17,7 @@ describe("User services", () => {
     // drop mocked user table
     afterEach(async () => {
         try {
-            await pool.query(`
+            return await pool.query(`
                 DROP TABLE IF EXISTS pg_temp.user_account
             `);
         } catch (err) {
