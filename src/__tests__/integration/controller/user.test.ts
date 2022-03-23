@@ -1,6 +1,7 @@
-import app from "../../app";
+/*
+import app from "../../../app";
 import request from "supertest";
-import pool from "../../db";
+import pool from "../../../db";
 
 // wipe user table after every test
 afterEach(async () => {
@@ -44,3 +45,4 @@ describe("POST /user", () => {
         expect(res.status).toBe(400);
     });
 });
+*/
