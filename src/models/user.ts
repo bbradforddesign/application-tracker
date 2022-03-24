@@ -14,13 +14,15 @@ class UserModel implements Model<Pool, UserFields, User> {
             text: `
                 INSERT INTO user_account (
                     first_name, 
-                    last_name
+                    last_name,
+                    auth_id
                 ) VALUES (
                     $1, 
-                    $2
+                    $2,
+                    $3
                 ) RETURNING *;
             `,
-            values: [fields.first_name, fields.last_name],
+            values: [fields.first_name, fields.last_name, fields.auth_id],
         });
     }
 
