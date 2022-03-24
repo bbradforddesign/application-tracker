@@ -4,7 +4,7 @@ import UserModel from "../../../models/user";
 
 describe("User model", () => {
     // mock user table
-    beforeEach(async () => {
+    beforeAll(async () => {
         try {
             return await pool.query(`
                 CREATE TEMPORARY TABLE user_account (LIKE user_account INCLUDING ALL)
@@ -15,7 +15,7 @@ describe("User model", () => {
     });
 
     // drop mocked user table
-    afterEach(async () => {
+    afterAll(async () => {
         try {
             return await pool.query(`
                 DROP TABLE IF EXISTS pg_temp.user_account

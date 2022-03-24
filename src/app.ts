@@ -1,4 +1,6 @@
 import express from "express";
+import { auth } from "express-oauth2-jwt-bearer";
+
 import indexRouter from "./routes/index";
 import userRouter from "./routes/user";
 
@@ -9,6 +11,6 @@ app.use(express.json());
 
 // api routers
 app.use("/", indexRouter);
-app.use("/user", userRouter);
+app.use("/user", auth(), userRouter);
 
 export default app;
