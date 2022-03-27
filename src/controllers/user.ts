@@ -1,6 +1,6 @@
 import { UserFields, User } from "../interfaces/user";
 import UserModel from "../models/user";
-import managementClient from "../services/auth";
+import managementClient from "../services/auth0";
 
 const UserController = {
     async registerUser(fields: UserFields): Promise<User> {

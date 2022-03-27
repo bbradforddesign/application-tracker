@@ -1,4 +1,6 @@
 import express, { Request, Response } from "express";
+import jwtAuthz from "express-jwt-authz";
+
 import UserController from "../controllers/user";
 import { UserFields } from "../interfaces/user";
 
@@ -31,6 +33,9 @@ userRouter.post("/", async (req: Request, res: Response) => {
 userRouter.get("/:id", async (req: Request, res: Response) => {
     const id = req.params.id;
 
+    // extract claims from jwt
+    console.log(req.user?.sub);
+
     if (!id) {
         res.status(404).end();
         return;
@@ -41,6 +46,7 @@ userRouter.get("/:id", async (req: Request, res: Response) => {
         const user = await UserController.getUser(id);
         if (!user) {
             res.status(404).end();
+            return;
         }
         res.status(200).json(user);
     } catch (err) {

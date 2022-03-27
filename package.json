@@ -13,7 +13,9 @@
     "license": "ISC",
     "devDependencies": {
         "@types/auth0": "^2.34.14",
+        "@types/cors": "^2.8.12",
         "@types/express": "^4.17.13",
+        "@types/express-jwt": "^6.0.4",
         "@types/jest": "^27.4.1",
         "@types/pg": "^8.6.5",
         "@types/supertest": "^2.0.11",
@@ -27,8 +29,11 @@
     },
     "dependencies": {
         "auth0": "^2.40.0",
+        "cors": "^2.8.5",
         "express": "^4.17.3",
-        "express-oauth2-jwt-bearer": "^1.1.0",
+        "express-jwt": "^6.1.1",
+        "express-jwt-authz": "^2.4.1",
+        "jwks-rsa": "^2.0.5",
         "pg": "^8.7.3"
     }
 }
