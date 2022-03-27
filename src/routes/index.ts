@@ -4,7 +4,7 @@ const indexRouter = express.Router();
 
 // confirms router is correctly configured
 indexRouter.get("/hello", (req: Request, res: Response) => {
-    res.status(200).json({
+    return res.status(200).json({
         message: "Hello",
     });
 });

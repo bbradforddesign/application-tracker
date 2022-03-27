@@ -4,6 +4,7 @@ import cors from "cors";
 import indexRouter from "./routes/index";
 import userRouter from "./routes/user";
 import validateAuth from "./services/validateAuth";
+import errorHandler from "./middleware/errorHandler";
 
 const app = express();
 
@@ -18,5 +19,11 @@ app.use(
 // api routers
 app.use("/", indexRouter);
 app.use("/user", validateAuth, userRouter);
+
+// error handling
+app.use(errorHandler);
+app.use((req, res, next) => {
+    return res.status(404).send("not found");
+});
 
 export default app;
