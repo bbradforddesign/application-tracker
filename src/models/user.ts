@@ -49,12 +49,23 @@ class UserModel implements Model<Pool, UserFields, User> {
     async update(user: User): Promise<QueryResult<User>> {
         return await this.pool.query({
             text: `
-                UPDATE user_account 
-                SET first_name = ($1), last_name = ($2) 
-                WHERE id = ($3)
-                RETURNING *;
+                INSERT INTO user_account (
+                    first_name,
+                    last_name,
+                    auth_id
+                ) VALUES (
+                    $1, 
+                    $2,
+                    $3
+                ) ON CONFLICT (
+                    auth_id
+                ) DO UPDATE
+                    SET 
+                    first_name = $1,
+                    last_name = $2
+                RETURNING first_name, last_name;
             `,
-            values: [user.first_name, user.last_name, user.id],
+            values: [user.first_name, user.last_name, user.auth_id],
         });
     }
 

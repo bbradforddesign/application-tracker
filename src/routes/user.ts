@@ -12,27 +12,14 @@ userRouter.put("/profile", async (req, res, next) => {
     }
 
     const fields: UserFields = req.body;
-    console.log(fields);
 
     try {
-        // retrieve user from db
-        let user = await UserController.getUserByAuth(req.user.sub);
-        if (!user) {
-            // if no match, create new profile from ID token
-            user = await UserController.registerUser({
-                auth_id: req.user.sub,
-            });
-            if (!user) {
-                throw new ApiError(500, "failed to register user");
-            }
-        }
-
-        // update profile with new fields
         const updatedProfile = await UserController.updateUser({
-            ...user,
+            auth_id: req.user.sub,
             first_name: fields.first_name,
             last_name: fields.last_name,
         });
+
         if (!updatedProfile) {
             throw new ApiError(500, "failed to update user");
         }

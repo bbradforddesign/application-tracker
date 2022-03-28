@@ -5,5 +5,5 @@ export interface UserFields {
 }
 
 export interface User extends UserFields {
-    id: string;
+    id?: string;
 }
