@@ -1,19 +1,10 @@
 import { UserFields, User } from "../interfaces/user";
 import UserModel from "../models/user";
-import managementClient from "../services/auth0";
 
 const UserController = {
+    // registers user within postgres if already within Auth0
     async registerUser(fields: UserFields): Promise<User> {
         try {
-            const authRes = await managementClient.createUser({
-                email: fields.email,
-                name: `${fields.first_name} ${fields.last_name}`,
-                password: fields.password,
-                username: `${fields.first_name}123`,
-                connection: "Username-Password-Authentication",
-            });
-
-            fields.auth_id = authRes.user_id || "";
             const res = await UserModel.create(fields);
             return res.rows[0];
         } catch (err) {
@@ -23,6 +14,22 @@ const UserController = {
     async getUser(id: string): Promise<User> {
         try {
             const res = await UserModel.get(id);
+            return res.rows[0];
+        } catch (err) {
+            throw err;
+        }
+    },
+    async getUserByAuth(authId: string): Promise<User> {
+        try {
+            const res = await UserModel.getByAuth(authId);
+            return res.rows[0];
+        } catch (err) {
+            throw err;
+        }
+    },
+    async updateUser(user: User): Promise<User> {
+        try {
+            const res = await UserModel.update(user);
             return res.rows[0];
         } catch (err) {
             throw err;

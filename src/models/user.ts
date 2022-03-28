@@ -36,12 +36,23 @@ class UserModel implements Model<Pool, UserFields, User> {
         });
     }
 
+    async getByAuth(authId: string): Promise<QueryResult<User>> {
+        return await this.pool.query({
+            text: `
+                SELECT * FROM user_account
+                WHERE auth_id = ($1) 
+            `,
+            values: [authId],
+        });
+    }
+
     async update(user: User): Promise<QueryResult<User>> {
         return await this.pool.query({
             text: `
                 UPDATE user_account 
                 SET first_name = ($1), last_name = ($2) 
-                WHERE id = ($3);
+                WHERE id = ($3)
+                RETURNING *;
             `,
             values: [user.first_name, user.last_name, user.id],
         });

@@ -1,49 +1,66 @@
 import express from "express";
-import jwtAuthz from "express-jwt-authz";
-import { ApiError } from "../classes/customError";
+import { ApiError } from "../classes/apiError";
 
 import UserController from "../controllers/user";
 import { UserFields } from "../interfaces/user";
 
 const userRouter = express.Router();
 
-userRouter.post("/", async (req, res, next) => {
-    const userFields: UserFields = req.body;
+userRouter.put("/profile", async (req, res, next) => {
+    if (!req.user) {
+        return next(new ApiError(401, "unauthorized"));
+    }
+
+    const fields: UserFields = req.body;
+    console.log(fields);
 
     try {
-        // validate that all required fields provided
-        if (!userFields.first_name || !userFields.last_name) {
-            throw new ApiError(400, "required fields must be provided");
+        // retrieve user from db
+        let user = await UserController.getUserByAuth(req.user.sub);
+        if (!user) {
+            // if no match, create new profile from ID token
+            user = await UserController.registerUser({
+                auth_id: req.user.sub,
+            });
+            if (!user) {
+                throw new ApiError(500, "failed to register user");
+            }
         }
 
-        // store user in db
-        const newUser = await UserController.registerUser(userFields);
-        if (!newUser) {
-            throw new ApiError(500, "failed to register user");
+        // update profile with new fields
+        const updatedProfile = await UserController.updateUser({
+            ...user,
+            first_name: fields.first_name,
+            last_name: fields.last_name,
+        });
+        if (!updatedProfile) {
+            throw new ApiError(500, "failed to update user");
         }
 
-        return res.status(200).json(newUser);
+        return res.status(200).json(updatedProfile);
     } catch (err) {
         return next(err);
     }
 });
 
-userRouter.get("/:id", async (req, res, next) => {
-    const id = req.params.id;
-
-    // extract claims from jwt
-    //console.log(req.user?.sub);
-
-    if (!id) {
-        return next();
+userRouter.get("/profile", async (req, res, next) => {
+    if (!req.user) {
+        return next(new ApiError(401, "unauthorized"));
     }
 
-    // retrieve user from db
     try {
-        const user = await UserController.getUser(id);
+        // retrieve user from db
+        let user = await UserController.getUserByAuth(req.user.sub);
         if (!user) {
-            return next();
+            // if no match, create new profile from ID token
+            user = await UserController.registerUser({
+                auth_id: req.user.sub,
+            });
+            if (!user) {
+                throw new ApiError(500, "failed to register user");
+            }
         }
+
         return res.status(200).json(user);
     } catch (err) {
         return next(err);
