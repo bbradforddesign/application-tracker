@@ -1,5 +1,3 @@
-jest.unmock("express-oauth2-jwt-bearer");
-
 import app from "../../../app";
 import request from "supertest";
 

@@ -1,3 +1,7 @@
+jest.mock("../../../services/validateAuth", () =>
+    jest.fn((req, res, next) => next())
+);
+
 import app from "../../../app";
 import request from "supertest";
 import pool from "../../../db";
@@ -32,6 +36,8 @@ describe("POST /user", () => {
                 .send({
                     first_name: "John",
                     last_name: "Doe",
+                    password: "abc",
+                    auth_id: "123",
                 })
                 .set("Content-Type", "application/json");
 
