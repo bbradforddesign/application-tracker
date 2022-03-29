@@ -10,10 +10,11 @@ jest.mock("../../../services/validateAuth", () =>
 import app from "../../../app";
 import request from "supertest";
 import pool from "../../../db";
+import UserModel from "../../../models/user";
 
 describe("GET /profile", () => {
     // mock user table
-    beforeAll(async () => {
+    beforeEach(async () => {
         try {
             return await pool.query(`
                 CREATE TEMPORARY TABLE user_account (LIKE user_account INCLUDING ALL)
@@ -24,7 +25,7 @@ describe("GET /profile", () => {
     });
 
     // drop mocked user table
-    afterAll(async () => {
+    afterEach(async () => {
         try {
             return await pool.query(`
                 DROP TABLE IF EXISTS pg_temp.user_account
@@ -35,15 +36,28 @@ describe("GET /profile", () => {
     });
 
     describe("authorized requests", () => {
-        test("successfully returns a blank profile", async () => {
+        test("returns 404 for missing profile", async () => {
             const res = await request(app)
-                .get("/user/profile")
+                .get("/user")
+                .set("Content-Type", "application/json");
+
+            expect(res.status).toBe(404);
+        });
+
+        test("returns an existing profile", async () => {
+            await UserModel.create({
+                id: "123",
+                first_name: "Paul",
+                last_name: "Blart",
+            });
+            const res = await request(app)
+                .get("/user")
                 .set("Content-Type", "application/json");
 
             expect(res.status).toBe(200);
             expect(res.body).toEqual({
-                first_name: null,
-                last_name: null,
+                first_name: "Paul",
+                last_name: "Blart",
             });
         });
     });

@@ -1,8 +1,7 @@
 import express from "express";
 import cors from "cors";
 
-import indexRouter from "./routes/index";
-import userRouter from "./routes/user";
+import userController from "./controllers/user";
 import validateAuth from "./services/validateAuth";
 import errorHandler from "./middleware/errorHandler";
 
@@ -17,8 +16,7 @@ app.use(
 );
 
 // api routers
-app.use("/", indexRouter);
-app.use("/user", validateAuth, userRouter);
+app.use("/user", validateAuth, userController);
 
 // error handling
 app.use(errorHandler);

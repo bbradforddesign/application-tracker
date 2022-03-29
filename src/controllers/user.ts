@@ -1,42 +1,75 @@
-import { User } from "../interfaces/user";
-import UserModel from "../models/user";
+import express from "express";
 import { ApiError } from "../classes/apiError";
 
-const UserController = {
-    async getUser(id: string): Promise<User> {
-        try {
-            // if no rows found, create new blank profile
-            let res = await UserModel.get(id);
+import UserModel from "../models/user";
+import { UserFields } from "../interfaces/user";
 
-            if (!res || res.rows.length === 0) {
-                res = await UserModel.create({
-                    id: id,
-                });
+const userController = express.Router();
 
-                if (!res || res.rows.length === 0) {
-                    throw new ApiError(500, "failed to retrieve user");
-                }
-            }
+userController.post("/", async (req, res, next) => {
+    if (!req.user) {
+        return next(new ApiError(401, "unauthorized"));
+    }
 
-            return res.rows[0];
-        } catch (err) {
-            throw err;
+    const fields: UserFields = req.body;
+
+    try {
+        const query = await UserModel.create({
+            id: req.user.sub,
+            first_name: fields.first_name,
+            last_name: fields.last_name,
+        });
+
+        if (!query || query.rows.length === 0) {
+            throw new ApiError(500, "failed to create user");
         }
-    },
-    async updateUser(user: User): Promise<User> {
-        try {
-            // upsert user profile with supplied fields
-            const res = await UserModel.update(user);
 
-            if (!res || res.rows.length === 0) {
-                throw new ApiError(500, "failed to update user");
-            }
+        return res.status(200).json(query.rows[0]);
+    } catch (err) {
+        return next(err);
+    }
+});
 
-            return res.rows[0];
-        } catch (err) {
-            throw err;
+userController.put("/", async (req, res, next) => {
+    if (!req.user) {
+        return next(new ApiError(401, "unauthorized"));
+    }
+
+    const fields: UserFields = req.body;
+
+    try {
+        const query = await UserModel.update({
+            id: req.user.sub,
+            first_name: fields.first_name,
+            last_name: fields.last_name,
+        });
+
+        if (!query || query.rows.length === 0) {
+            throw new ApiError(500, "failed to update user");
         }
-    },
-};
 
-export default UserController;
+        return res.status(200).json(query.rows[0]);
+    } catch (err) {
+        return next(err);
+    }
+});
+
+userController.get("/", async (req, res, next) => {
+    if (!req.user) {
+        return next(new ApiError(401, "unauthorized"));
+    }
+
+    try {
+        const query = await UserModel.get(req.user.sub);
+
+        if (!query || query.rows.length === 0) {
+            return next();
+        }
+
+        return res.status(200).json(query.rows[0]);
+    } catch (err) {
+        return next(err);
+    }
+});
+
+export default userController;
