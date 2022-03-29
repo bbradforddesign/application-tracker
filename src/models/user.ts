@@ -20,7 +20,7 @@ class UserModel implements Model<Pool, UserFields, User> {
                     $1, 
                     $2,
                     $3
-                ) RETURNING *;
+                ) RETURNING first_name, last_name;
             `,
             values: [fields.first_name, fields.last_name, fields.id],
         });

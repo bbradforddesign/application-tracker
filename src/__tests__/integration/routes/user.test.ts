@@ -1,12 +1,17 @@
 jest.mock("../../../services/validateAuth", () =>
-    jest.fn((req, res, next) => next())
+    jest.fn((req, res, next) => {
+        req.user = {
+            sub: "123",
+        };
+        next();
+    })
 );
 
 import app from "../../../app";
 import request from "supertest";
 import pool from "../../../db";
 
-describe("POST /user", () => {
+describe("GET /profile", () => {
     // mock user table
     beforeAll(async () => {
         try {
@@ -30,39 +35,16 @@ describe("POST /user", () => {
     });
 
     describe("authorized requests", () => {
-        test("successfully registers a user", async () => {
+        test("successfully returns a blank profile", async () => {
             const res = await request(app)
-                .post("/user")
-                .send({
-                    first_name: "John",
-                    last_name: "Doe",
-                    password: "abc",
-                    auth_id: "123",
-                })
+                .get("/user/profile")
                 .set("Content-Type", "application/json");
 
             expect(res.status).toBe(200);
-            expect(res.body.first_name).toBe("John");
-            expect(res.body.last_name).toBe("Doe");
-            expect(res.body.id).not.toBeNull();
-        });
-
-        test("fails user registration if missing last name", async () => {
-            const res = await request(app)
-                .post("/user")
-                .send({ first_name: "John" })
-                .set("Content-Type", "application/json");
-
-            expect(res.status).toBe(400);
-        });
-
-        test("fails user registration if missing first name", async () => {
-            const res = await request(app)
-                .post("/user")
-                .send({ last_name: "Doe" })
-                .set("Content-Type", "application/json");
-
-            expect(res.status).toBe(400);
+            expect(res.body).toEqual({
+                first_name: null,
+                last_name: null,
+            });
         });
     });
 });

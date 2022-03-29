@@ -55,7 +55,6 @@ describe("User model", () => {
             const newUser = res.rows[0];
 
             expect(newUser).toEqual({
-                id: "123",
                 first_name: "Bob",
                 last_name: "Smith",
             });
@@ -74,7 +73,6 @@ describe("User model", () => {
             const newUser = createRes.rows[0];
 
             expect(newUser).toEqual({
-                id: "123",
                 first_name: "Bob",
                 last_name: "Smith",
             });
