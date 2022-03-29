@@ -51,8 +51,8 @@ class UserModel implements Model<Pool, UserFields, User> {
                     id 
                 ) DO UPDATE
                     SET 
-                    first_name = $1,
-                    last_name = $2
+                    first_name = COALESCE($1, user_account.first_name),
+                    last_name = COALESCE($2, user_account.last_name)
                 RETURNING first_name, last_name;
             `,
             values: [user.first_name, user.last_name, user.id],

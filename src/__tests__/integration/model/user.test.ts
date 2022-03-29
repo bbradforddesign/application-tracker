@@ -1,10 +1,10 @@
 import pool from "../../../db";
-import { UserFields } from "../../../interfaces/user";
+import { User } from "../../../interfaces/user";
 import UserModel from "../../../models/user";
 
 describe("User model", () => {
     // mock user table
-    beforeAll(async () => {
+    beforeEach(async () => {
         try {
             return await pool.query(`
                 CREATE TEMPORARY TABLE user_account (LIKE user_account INCLUDING ALL)
@@ -15,7 +15,7 @@ describe("User model", () => {
     });
 
     // drop mocked user table
-    afterAll(async () => {
+    afterEach(async () => {
         try {
             return await pool.query(`
                 DROP TABLE IF EXISTS pg_temp.user_account
@@ -27,37 +27,38 @@ describe("User model", () => {
 
     test("retrieves user from the users table", async () => {
         try {
-            const createRes = await UserModel.create({
+            await UserModel.create({
                 first_name: "Bob",
                 last_name: "Smith",
-                auth_id: "123",
+                id: "123",
             });
-            const newUser = createRes.rows[0];
 
-            const getRes = await UserModel.get(newUser.id);
+            const getRes = await UserModel.get("123");
             const user = getRes.rows[0];
 
-            expect(user.first_name).toEqual("Bob");
-            expect(user.last_name).toEqual("Smith");
+            expect(user).toEqual({
+                first_name: "Bob",
+                last_name: "Smith",
+            });
         } catch (err) {
             console.log(err);
         }
     });
 
     test("creates a new user within the users table", async () => {
-        const userFields: UserFields = {
-            first_name: "Bob",
-            last_name: "Smith",
-            auth_id: "123",
-        };
-
         try {
-            const res = await UserModel.create(userFields);
+            const res = await UserModel.create({
+                first_name: "Bob",
+                last_name: "Smith",
+                id: "123",
+            });
             const newUser = res.rows[0];
 
-            expect(newUser.first_name).toEqual(userFields.first_name);
-            expect(newUser.last_name).toEqual(userFields.last_name);
-            expect(newUser.id).not.toBeNull();
+            expect(newUser).toEqual({
+                id: "123",
+                first_name: "Bob",
+                last_name: "Smith",
+            });
         } catch (err) {
             console.log(err);
         }
@@ -68,18 +69,26 @@ describe("User model", () => {
             const createRes = await UserModel.create({
                 first_name: "Bob",
                 last_name: "Smith",
-                auth_id: "123",
+                id: "123",
             });
             const newUser = createRes.rows[0];
 
-            newUser.first_name = "John";
-            newUser.last_name = "Doe";
+            expect(newUser).toEqual({
+                id: "123",
+                first_name: "Bob",
+                last_name: "Smith",
+            });
 
-            const updateRes = await UserModel.update(newUser);
+            const updateRes = await UserModel.update({
+                id: "123",
+                first_name: "Mike",
+            });
             const user = updateRes.rows[0];
 
-            expect(user.first_name).toEqual("John");
-            expect(user.last_name).toEqual("Doe");
+            expect(user).toEqual({
+                first_name: "Mike",
+                last_name: "Smith",
+            });
         } catch (err) {
             console.log(err);
         }
@@ -87,16 +96,15 @@ describe("User model", () => {
 
     test("deletes a user in the users table", async () => {
         try {
-            const createRes = await UserModel.create({
+            await UserModel.create({
                 first_name: "Bob",
                 last_name: "Smith",
-                auth_id: "123",
+                id: "123",
             });
-            const newUser = createRes.rows[0];
 
-            await UserModel.delete(newUser.id);
+            await UserModel.delete("123");
 
-            const verifyRes = await UserModel.get(newUser.id);
+            const verifyRes = await UserModel.get("123");
 
             expect(verifyRes).toBeNull;
         } catch (err) {
