@@ -9,40 +9,30 @@ class UserModel implements Model<Pool, UserFields, User> {
         this.pool = pool;
     }
 
-    async create(fields: UserFields): Promise<QueryResult<User>> {
+    async create(fields: User): Promise<QueryResult<User>> {
         return await this.pool.query({
             text: `
                 INSERT INTO user_account (
                     first_name, 
                     last_name,
-                    auth_id
+                    id
                 ) VALUES (
                     $1, 
                     $2,
                     $3
                 ) RETURNING *;
             `,
-            values: [fields.first_name, fields.last_name, fields.auth_id],
+            values: [fields.first_name, fields.last_name, fields.id],
         });
     }
 
-    async get(id: string): Promise<QueryResult<User>> {
+    async get(userId: string): Promise<QueryResult<User>> {
         return await this.pool.query({
             text: `
-                SELECT * FROM user_account
-                WHERE id = ($1)
+                SELECT first_name, last_name FROM user_account
+                WHERE id = ($1) 
             `,
-            values: [id],
-        });
-    }
-
-    async getByAuth(authId: string): Promise<QueryResult<User>> {
-        return await this.pool.query({
-            text: `
-                SELECT * FROM user_account
-                WHERE auth_id = ($1) 
-            `,
-            values: [authId],
+            values: [userId],
         });
     }
 
@@ -52,20 +42,20 @@ class UserModel implements Model<Pool, UserFields, User> {
                 INSERT INTO user_account (
                     first_name,
                     last_name,
-                    auth_id
+                    id
                 ) VALUES (
                     $1, 
                     $2,
                     $3
                 ) ON CONFLICT (
-                    auth_id
+                    id 
                 ) DO UPDATE
                     SET 
                     first_name = $1,
                     last_name = $2
                 RETURNING first_name, last_name;
             `,
-            values: [user.first_name, user.last_name, user.auth_id],
+            values: [user.first_name, user.last_name, user.id],
         });
     }
 

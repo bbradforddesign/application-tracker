@@ -15,7 +15,7 @@ userRouter.put("/profile", async (req, res, next) => {
 
     try {
         const updatedProfile = await UserController.updateUser({
-            auth_id: req.user.sub,
+            id: req.user.sub,
             first_name: fields.first_name,
             last_name: fields.last_name,
         });
@@ -35,13 +35,16 @@ userRouter.get("/profile", async (req, res, next) => {
         return next(new ApiError(401, "unauthorized"));
     }
 
+    // TODO: since controller methods currently map 1:1 to model,
+    // no reason for controller currently.
+    // need to move business logic into controller.
     try {
         // retrieve user from db
-        let user = await UserController.getUserByAuth(req.user.sub);
+        let user = await UserController.getUser(req.user.sub);
         if (!user) {
             // if no match, create new profile from ID token
             user = await UserController.registerUser({
-                auth_id: req.user.sub,
+                id: req.user.sub,
             });
             if (!user) {
                 throw new ApiError(500, "failed to register user");
