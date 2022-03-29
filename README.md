@@ -8,14 +8,13 @@ record jobs that they've applied to, receive follow-up reminders, and analyze th
 The app communicates with clients via a REST API, and is built with Node.js, Express.js, TypeScript, and PostgreSQL.
 It's fully dockerized, and includes unit and integration tests using Jest.
 
-The general structure is as follows:
+The general project structure is as follows:
 
-1. `/models` - defines data structures that will be used throughout the application. 
-2. `/routes` - performs request validation, and directs requests to be handled by specific controller functions. Sends output from controller functions 
+1. `/models` - functionality that interacts with the app's database. 
+2. `/routes` - REST API handler functionality. Performs request validation, and directs requests to be handled by specific controller functions. Sends output from controller functions 
 to the client.
-3. `/controllers` - delegates tasks to various service functions, and returns the results to the route handler to be output.
-4. `/services` - simple functions that perform a single task. May include functionality such as performing a CRUD operation on a database record, 
-sending an external API request, etc.
+3. `/controllers` - delegates tasks to various services and model functions, and returns the results to the route handler to be output.
+4. `/services` - includes functionality provided from external services, such as SDKs.
 
 ## Running the App
 
@@ -40,3 +39,6 @@ While the app's docker container is running, open an interactive terminal for th
 ```
 npm test
 ```
+
+Tests are contained in the `__tests__` directory, and broken into subdirectories by test type. 
+Manually mocked services, such as node modules, are included in the `__mocks__` directory.
